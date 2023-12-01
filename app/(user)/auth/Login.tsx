@@ -16,6 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -35,33 +38,37 @@ export default function Login() {
   });
 
   const { toast } = useToast();
+  const router = useRouter();
 
-  async function handleLogin(data: z.infer<typeof formSchema>) {
-    try {
-      const response = await axios.post("/api/user/login", data);
-
-      if (response.data.status === 200) {
-        toast({
-          title: "Success",
-          description: response.data.message,
-          variant: "default",
-        });
-      } else {
-        throw new Error(response.data.message);
-      }
-    } catch (error: any) {
+  const { mutate: handleLogin, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await axios.post("/api/user/login", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Suceess",
+        description: "Logged in successfully",
+        variant: "default",
+      });
+      router.push("/");
+    },
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "An error occurred",
         variant: "destructive",
       });
-    }
-  }
+    },
+  });
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleLogin)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin(form.getValues());
+        }}
         className="space-y-8 desktop:w-[80%] font-poppins"
       >
         <FormField
@@ -92,7 +99,9 @@ export default function Login() {
             </FormItem>
           )}
         />
-        <Button type="submit">Login</Button>
+        <Button type="submit" disabled={isPending}>
+          Login
+        </Button>
       </form>
     </Form>
   );
