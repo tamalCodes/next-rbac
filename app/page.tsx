@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
 import Link from 'next/link'
@@ -20,7 +19,7 @@ export default function Home() {
     <main className="px-10 py-6 desktop:px-20">
       <div className='flex justify-between items-center'>
         <h1 className='font-poppins text-[1.5rem] font-bold'>Hello</h1>
-        <Link className={buttonVariants({ variant: "default" })} href={"/lol"}>Signup</Link>
+        <Link className={buttonVariants({ variant: "default" })} href={"/auth"}>Signup</Link>
       </div>
 
       <div className='flex gap-4 mt-10 flex-wrap items-center justify-center'>
@@ -135,6 +134,8 @@ export default function Home() {
         </Card>
 
       </div>
+
+
     </main>
   )
 }

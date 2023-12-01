@@ -11,7 +11,10 @@ export const POST = async (request: any) => {
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      return new NextResponse("Email is not in use", { status: 400 });
+      return NextResponse.json({
+        message: "User doesn't exist",
+        status: 400,
+      });
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -20,10 +23,16 @@ export const POST = async (request: any) => {
     );
 
     if (!isPasswordCorrect) {
-      return new NextResponse("Password is incorrect", { status: 400 });
+      return NextResponse.json({
+        message: "Invalid Credentials",
+        status: 401,
+      });
     }
 
-    return new NextResponse("user is logged in", { status: 200 });
+    return NextResponse.json({
+      message: "Logged in successfully",
+      status: 200,
+    });
   } catch (err: any) {
     return new NextResponse(err, {
       status: 500,
