@@ -52,13 +52,22 @@ export default function Login() {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(["user"], data);
-      toast({
-        title: "Success",
-        description: "Logged in successfully",
-        variant: "default",
-      });
-      router.push("/");
+      if (data.status !== 200) {
+        toast({
+          title: "Error",
+          description: data.message || "An error occurred",
+          variant: "destructive",
+        });
+      } else {
+        queryClient.setQueryData(["user"], data);
+        // queryClient.invalidateQueries({ queryKey: ["user"] });
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+          variant: "default",
+        });
+        router.push("/");
+      }
     },
 
     onError: (error: any) => {

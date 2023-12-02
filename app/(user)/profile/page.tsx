@@ -1,9 +1,15 @@
-import Image from "next/image";
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 export default function Profile() {
+  const queryClient = useQueryClient();
+  const user: any = queryClient.getQueryData(["user"]);
+
   return (
     <main className="px-10 py-6 desktop:px-20">
       <div className="flex justify-between items-center">
@@ -11,17 +17,19 @@ export default function Profile() {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <Link
-          className={buttonVariants({ variant: "default" })}
-          href={"/edit-profile"}
-        >
-          Edit Profile
-        </Link>
+        {user && (
+          <Link
+            className={buttonVariants({ variant: "default" })}
+            href={"/edit-profile"}
+          >
+            Edit Profile
+          </Link>
+        )}
       </div>
 
       <div className="mt-10 font-poppins flex flex-col gap-4 desktop:mt-15">
         <h1 className="text heading">Tamal Das</h1>
-        <p className="text text-[19px] font-medium">Hi there from Tamal</p>
+        <p className="text text-[19px] font-medium">{user && user?.email}</p>
         <p className="text desktop:w-[80%]">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga non
           sequi nemo veritatis harum neque error rerum dignissimos illum fugiat,

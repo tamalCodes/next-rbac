@@ -37,7 +37,7 @@ export const POST = async (request: any) => {
 
     return NextResponse.json({
       token,
-      message: "Logged in successfully",
+      user: { email: existingUser.email },
       status: 200,
     });
   } catch (err: any) {
