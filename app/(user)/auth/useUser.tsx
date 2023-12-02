@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 
-export function checkAuth(token: string | undefined) {
-  if (token === undefined || token === null) return;
+type CheckAuthResult = {
+  authenticatedUser: any;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+export function checkAuth(token: string | undefined): CheckAuthResult {
+  if (token === undefined || token === null) {
+    return { authenticatedUser: undefined, isLoading: false, isError: false };
+  }
 
   const {
     data: authenticatedUser,
@@ -10,7 +18,7 @@ export function checkAuth(token: string | undefined) {
   } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const response = await fetch(`/api/user/isautheticated`, {
+      const response = await fetch(`/api/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
