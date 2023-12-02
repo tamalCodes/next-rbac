@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 import {
@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
+import Spinner from "./spinner";
 
 type User = {
   _id: string;
@@ -26,6 +27,7 @@ type User = {
 };
 
 const Cards = () => {
+  const queryClient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -35,16 +37,16 @@ const Cards = () => {
   });
 
   if (isLoading) {
-    return <h1 className="text">Loading . . . .</h1>;
+    return <Spinner />;
   }
 
   if (isError) {
-    return <h1 className="text">Error</h1>;
+    return <h1 className="text heading">Error</h1>;
   }
 
   return (
     <>
-      {data?.map((user, idx) => {
+      {data?.map((user, idx: number) => {
         return (
           <Card className="w-[350px] font-poppins" key={idx}>
             <CardHeader className="flex flex-row justify-between items-center">
@@ -52,7 +54,7 @@ const Cards = () => {
                 <CardTitle>
                   {user.firstName} {user.lastName}
                 </CardTitle>
-                <CardDescription>Hi there from Tamal</CardDescription>
+                <CardDescription>{user?.email}</CardDescription>
               </div>
 
               <Avatar>
@@ -75,7 +77,10 @@ const Cards = () => {
             <CardFooter className="flex justify-between">
               <Link
                 className={buttonVariants({ variant: "outline" })}
-                href={"/profile"}
+                href={`/user/${user._id}`}
+                // onClick={() => {
+                //   queryClient.invalidateQueries({ queryKey: ["singleuser"] });
+                // }}
               >
                 Read more
               </Link>

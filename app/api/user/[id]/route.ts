@@ -1,15 +1,14 @@
 import User from "@/models/User.js";
 import connect from "@/utils/db";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET({ params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest) {
   try {
     await connect();
 
-    const users = await User.find({});
-
+    const user = await User.findById(request.url.split("user/")[1]);
     return NextResponse.json({
-      users,
+      user,
     });
   } catch (err: any) {
     return new NextResponse(err, {

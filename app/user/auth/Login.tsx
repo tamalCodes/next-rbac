@@ -4,6 +4,7 @@ import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,9 +14,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  UseMutateFunction,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -23,87 +31,63 @@ const formSchema = z.object({
     .string()
     .min(4, { message: "Password must be atleast 4 characters" })
     .max(50),
-  firstName: z
-    .string()
-    .min(2, { message: "First name must be atleast 2 characters" })
-    .max(50),
-  lastName: z
-    .string()
-    .min(2, { message: "Last name must be atleast 2 characters" })
-    .max(50),
 });
 
-export default function SignUp() {
+export default function Login() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
-      firstName: "",
-      lastName: "",
     },
   });
 
   const { toast } = useToast();
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
-  async function handleSignup(data: z.infer<typeof formSchema>) {
-    try {
-      const response = await axios.post("/api/user/signup", data);
-
-      if (response.data.status === 201) {
+  const { mutate: handleLogin, isPending } = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const response = await axios.post("/api/user/login", data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.status !== 200) {
         toast({
-          title: "Success",
-          description: response.data.message,
-          variant: "default",
+          title: "Error",
+          description: data.message || "An error occurred",
+          variant: "destructive",
         });
       } else {
-        throw new Error(response.data.message);
+        queryClient.setQueryData(["user"], data);
+
+        toast({
+          title: "Success",
+          description: "Logged in successfully",
+          variant: "default",
+        });
+        router.push("/");
       }
-    } catch (error: any) {
+    },
+
+    onError: (error: any) => {
       toast({
         title: "Error",
         description: error.message || "An error occurred",
         variant: "destructive",
       });
-    }
-  }
+    },
+  });
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(handleSignup)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleLogin(form.getValues());
+        }}
         className="space-y-8 desktop:w-[80%] font-poppins"
       >
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John" {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Doe" {...field} />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="email"
@@ -132,8 +116,9 @@ export default function SignUp() {
             </FormItem>
           )}
         />
-
-        <Button type="submit">SignUp</Button>
+        <Button type="submit" disabled={isPending}>
+          Login
+        </Button>
       </form>
     </Form>
   );

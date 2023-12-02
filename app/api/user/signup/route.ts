@@ -2,6 +2,7 @@ import User from "@/models/User.js";
 import connect from "@/utils/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export async function POST(request: any) {
   try {
@@ -26,8 +27,15 @@ export async function POST(request: any) {
 
     await newUser.save();
 
+    const payload = { User: { id: email } };
+    const token = jwt.sign(
+      payload,
+      "askdhakdbasjhdbasjhdbjh32j23j423h4b2kuhg23i7udkqwj%%^"
+    );
+
     return NextResponse.json({
-      message: "User created successfully",
+      token,
+      user: { email: email },
       status: 201,
     });
   } catch (error: any) {

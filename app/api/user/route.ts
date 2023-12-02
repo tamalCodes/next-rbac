@@ -3,7 +3,7 @@ import connect from "@/utils/db";
 import jwt from "jsonwebtoken";
 import User from "@/models/User";
 
-export const GET = async (request: any) => {
+export const GET = async (request: Request) => {
   try {
     await connect();
 
