@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useMemo } from "react";
@@ -20,6 +22,7 @@ const UserRoles = () => {
   const queryClient = useQueryClient();
 
   const user: any = queryClient.getQueryData(["singleuser"]);
+  const authenticatedUser: any = queryClient.getQueryData(["user"]);
 
   const {
     data: permissions,
@@ -50,6 +53,26 @@ const UserRoles = () => {
     );
   }
 
+  function handlePermission(requiredPermission: String) {
+    const hasViewPermissions = permissions?.perms.some(
+      (permission) => permission.name === requiredPermission
+    );
+
+    if (!hasViewPermissions) {
+      toast({
+        title: "Error",
+        description: "Permission denied",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Permission granted",
+        variant: "default",
+      });
+    }
+  }
+
   return (
     <div className="mt-4 font-poppins flex flex-col gap-4 desktop:mt-15">
       <h1 className="text heading">User Permissions</h1>
@@ -63,6 +86,39 @@ const UserRoles = () => {
           );
         })}
       </div>
+
+      {authenticatedUser && (
+        <div className="flex gap-2">
+          <Button
+            onClick={() => {
+              handlePermission("View Permissions");
+            }}
+          >
+            View Permission
+          </Button>
+          <Button
+            onClick={() => {
+              handlePermission("Share Permissions");
+            }}
+          >
+            Share Permission
+          </Button>
+          <Button
+            onClick={() => {
+              handlePermission("Delete Permissions");
+            }}
+          >
+            Delete Permission
+          </Button>
+          <Button
+            onClick={() => {
+              handlePermission("Ban Permissions");
+            }}
+          >
+            Ban Permission
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
