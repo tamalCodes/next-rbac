@@ -33,11 +33,21 @@ export async function POST(request: any) {
       "askdhakdbasjhdbasjhdbjh32j23j423h4b2kuhg23i7udkqwj%%^"
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       token,
       user: { email: email },
       status: 201,
     });
+
+    response.cookies
+      .set("token", token, {
+        httpOnly: true,
+      })
+      .set("user", email, {
+        httpOnly: false,
+      });
+
+    return response;
   } catch (error: any) {
     return new NextResponse(error, {
       status: 500,

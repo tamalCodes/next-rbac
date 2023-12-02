@@ -1,20 +1,21 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { getCookie, getCookies } from "cookies-next";
 
 type CheckAuthResult = {
   authenticatedUser: any;
   isLoading: boolean;
-  isFetching: boolean;
   isError: boolean;
 };
 
 export function checkAuth(token: string | undefined): CheckAuthResult {
-  if (token === undefined || token === null) {
+  const cookie = getCookie("user");
+
+  if (cookie === undefined || !cookie) {
     return {
       authenticatedUser: undefined,
       isLoading: false,
-      isFetching: false,
       isError: false,
     };
   }
@@ -31,12 +32,12 @@ export function checkAuth(token: string | undefined): CheckAuthResult {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
       });
+
       return await response.json();
     },
   });
 
-  console.log(isFetching);
-
-  return { authenticatedUser, isLoading, isFetching, isError };
+  return { authenticatedUser, isLoading, isError };
 }

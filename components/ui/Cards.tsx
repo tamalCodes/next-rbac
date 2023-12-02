@@ -31,7 +31,9 @@ const Cards = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:3000/api/user/all");
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_DOMAIN}/api/user/all`
+      );
       return data.users as User[];
     },
   });

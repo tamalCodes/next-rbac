@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connect from "@/utils/db";
 import jwt from "jsonwebtoken";
 import User from "@/models/User";
 
-export const GET = async (request: Request) => {
+export const GET = async (request: NextRequest) => {
   try {
     await connect();
 
-    const token = request.headers.get("Authorization");
+    const token =
+      request?.cookies?.get("token")?.value ||
+      request.headers.get("Authorization")?.split(" ")[1];
 
     if (!token) {
       return new NextResponse("Not authorized", {
@@ -17,11 +19,12 @@ export const GET = async (request: Request) => {
 
     const decoded: any = await new Promise((resolve, reject) => {
       jwt.verify(
-        token.split(" ")[1],
+        token,
         "askdhakdbasjhdbasjhdbjh32j23j423h4b2kuhg23i7udkqwj%%^",
         (err: any, decoded: any) => {
           if (err) {
             reject(err);
+            console.log(err);
           } else {
             console.log(decoded);
             resolve(decoded);

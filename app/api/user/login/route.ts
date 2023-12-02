@@ -35,11 +35,21 @@ export const POST = async (request: any) => {
       "askdhakdbasjhdbasjhdbjh32j23j423h4b2kuhg23i7udkqwj%%^"
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       token,
       user: { email: existingUser.email },
       status: 200,
     });
+
+    response.cookies
+      .set("token", token, {
+        httpOnly: true,
+      })
+      .set("user", existingUser.email, {
+        httpOnly: false,
+      });
+
+    return response;
   } catch (err: any) {
     return new NextResponse(err, {
       status: 500,

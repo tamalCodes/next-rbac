@@ -29,7 +29,7 @@ const UserRoles = () => {
     queryKey: ["userperms"],
     queryFn: async () => {
       const { data } = await axios.get(
-        `http://localhost:3000/api/permissions?role=${user?.role}`
+        `${process.env.NEXT_PUBLIC_DOMAIN}/api/permissions?role=${user?.role}`
       );
       return data as ApiResponse;
     },

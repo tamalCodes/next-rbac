@@ -88,10 +88,9 @@ export default function SignUp() {
   return (
     <Form {...form}>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSignup(form.getValues());
-        }}
+        onSubmit={form.handleSubmit((data) => {
+          handleSignup(data);
+        })}
         className="space-y-8 desktop:w-[80%] font-poppins"
       >
         <FormField

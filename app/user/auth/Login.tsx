@@ -82,10 +82,9 @@ export default function Login() {
   return (
     <Form {...form}>
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleLogin(form.getValues());
-        }}
+        onSubmit={form.handleSubmit((data) => {
+          handleLogin(data);
+        })}
         className="space-y-8 desktop:w-[80%] font-poppins"
       >
         <FormField

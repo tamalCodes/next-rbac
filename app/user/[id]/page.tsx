@@ -35,7 +35,9 @@ export default function Profile({
   } = useQuery({
     queryKey: ["singleuser"],
     queryFn: async () => {
-      const { data } = await axios.get(`http://localhost:3000/api/user/${id}`);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_DOMAIN}/api/user/${id}`
+      );
       return data.user as User;
     },
   });
