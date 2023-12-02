@@ -2,6 +2,7 @@ import User from "@/models/User.js";
 import connect from "@/utils/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 export const POST = async (request: any) => {
   try {
@@ -11,9 +12,8 @@ export const POST = async (request: any) => {
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      return NextResponse.json({
-        message: "User doesn't exist",
-        status: 400,
+      return new NextResponse("User doesn't exist", {
+        status: 401,
       });
     }
 
@@ -29,7 +29,14 @@ export const POST = async (request: any) => {
       });
     }
 
+    const payload = { User: { id: existingUser.email } };
+    const token = jwt.sign(
+      payload,
+      "askdhakdbasjhdbasjhdbjh32j23j423h4b2kuhg23i7udkqwj%%^"
+    );
+
     return NextResponse.json({
+      token,
       message: "Logged in successfully",
       status: 200,
     });

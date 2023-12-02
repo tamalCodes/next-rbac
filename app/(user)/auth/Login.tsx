@@ -16,7 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  UseMutateFunction,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -39,20 +44,23 @@ export default function Login() {
 
   const { toast } = useToast();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const { mutate: handleLogin, isPending } = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await axios.post("/api/user/login", data);
+      const response = await axios.post("/api/user/login", data);
+      return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], data);
       toast({
-        title: "Suceess",
+        title: "Success",
         description: "Logged in successfully",
         variant: "default",
       });
       router.push("/");
     },
+
     onError: (error: any) => {
       toast({
         title: "Error",
